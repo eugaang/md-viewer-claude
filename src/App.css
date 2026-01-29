@@ -105,6 +105,7 @@ body {
   padding: 0.5rem 1rem;
   background-color: var(--accent-color);
   color: white;
+  border: none;
   border-radius: 6px;
   cursor: pointer;
   font-size: 0.875rem;
@@ -265,6 +266,47 @@ body {
 
 .paste-submit-btn:hover {
   background-color: var(--accent-hover);
+}
+
+/* Current File Name */
+.current-file-name {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Auto Refresh Button */
+.auto-refresh-btn {
+  padding: 0.5rem 0.75rem;
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.auto-refresh-btn:hover {
+  background-color: var(--accent-color);
+  color: white;
+  border-color: var(--accent-color);
+}
+
+.auto-refresh-btn.active {
+  background-color: #4caf50;
+  color: white;
+  border-color: #4caf50;
+}
+
+.auto-refresh-btn.active:hover {
+  background-color: #43a047;
+  border-color: #43a047;
 }
 
 /* Translate Button Styles */
