@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import MarkdownViewer from './components/MarkdownViewer'
 import FileLoader from './components/FileLoader'
 import TableOfContents from './components/TableOfContents'
@@ -65,8 +65,6 @@ print(fibonacci(10))
 좌측의 목차에서 원하는 섹션을 클릭하면 해당 위치로 이동합니다.
 `
 
-const WATCH_INTERVAL = 1000 // Check file changes every 1 second
-
 function App() {
   const [markdown, setMarkdown] = useState(DEFAULT_MARKDOWN)
   const [originalMarkdown, setOriginalMarkdown] = useState(null)
@@ -74,9 +72,7 @@ function App() {
     const saved = localStorage.getItem('theme')
     return saved || 'light'
   })
-  const [autoRefresh, setAutoRefresh] = useState(true)
   const [fileHandle, setFileHandle] = useState(null)
-  const lastModifiedRef = useRef(null)
 
   const handleLoad = (content) => {
     setMarkdown(content)
@@ -85,37 +81,19 @@ function App() {
 
   const handleFileHandleChange = useCallback((handle) => {
     setFileHandle(handle)
-    lastModifiedRef.current = null
   }, [])
 
-  // Watch for file changes
-  useEffect(() => {
-    if (!fileHandle || !autoRefresh) return
-
-    const checkForChanges = async () => {
-      try {
-        const file = await fileHandle.getFile()
-        const currentModified = file.lastModified
-
-        if (lastModifiedRef.current === null) {
-          lastModifiedRef.current = currentModified
-          return
-        }
-
-        if (currentModified !== lastModifiedRef.current) {
-          lastModifiedRef.current = currentModified
-          const content = await file.text()
-          setMarkdown(content)
-          setOriginalMarkdown(null)
-        }
-      } catch (err) {
-        console.error('Error checking file changes:', err)
-      }
+  const handleRefresh = useCallback(async () => {
+    if (!fileHandle) return
+    try {
+      const file = await fileHandle.getFile()
+      const content = await file.text()
+      setMarkdown(content)
+      setOriginalMarkdown(null)
+    } catch (err) {
+      console.error('Error refreshing file:', err)
     }
-
-    const intervalId = setInterval(checkForChanges, WATCH_INTERVAL)
-    return () => clearInterval(intervalId)
-  }, [fileHandle, autoRefresh])
+  }, [fileHandle])
 
   const handleTranslate = (translated) => {
     if (!originalMarkdown) {
@@ -148,11 +126,11 @@ function App() {
           <FileLoader onLoad={handleLoad} onFileHandleChange={handleFileHandleChange} />
           {fileHandle && (
             <button
-              onClick={() => setAutoRefresh(!autoRefresh)}
-              className={`auto-refresh-btn ${autoRefresh ? 'active' : ''}`}
-              title={autoRefresh ? 'Auto-refresh enabled' : 'Auto-refresh disabled'}
+              onClick={handleRefresh}
+              className="refresh-btn"
+              title="Refresh file"
             >
-              {autoRefresh ? '🔄 Auto' : '⏸ Paused'}
+              Refresh
             </button>
           )}
           <TranslateButton

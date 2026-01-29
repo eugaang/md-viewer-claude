@@ -278,35 +278,24 @@ body {
   white-space: nowrap;
 }
 
-/* Auto Refresh Button */
-.auto-refresh-btn {
+/* Refresh Button */
+.refresh-btn {
   padding: 0.5rem 0.75rem;
   background-color: var(--bg-tertiary);
   color: var(--text-primary);
   border: 1px solid var(--border-color);
   border-radius: 6px;
   cursor: pointer;
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   font-weight: 500;
   transition: all 0.2s;
   white-space: nowrap;
 }
 
-.auto-refresh-btn:hover {
+.refresh-btn:hover {
   background-color: var(--accent-color);
   color: white;
   border-color: var(--accent-color);
-}
-
-.auto-refresh-btn.active {
-  background-color: #4caf50;
-  color: white;
-  border-color: #4caf50;
-}
-
-.auto-refresh-btn.active:hover {
-  background-color: #43a047;
-  border-color: #43a047;
 }
 
 /* Translate Button Styles */
