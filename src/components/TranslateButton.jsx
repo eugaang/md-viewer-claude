@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-function TranslateButton({ markdown, onTranslate }) {
+function TranslateButton({ markdown, onTranslate, hasOriginal, onShowOriginal }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -80,14 +80,24 @@ function TranslateButton({ markdown, onTranslate }) {
 
   return (
     <div className="translate-wrapper">
-      <button
-        onClick={handleTranslate}
-        disabled={loading}
-        className="translate-btn"
-        title="Translate to Korean"
-      >
-        {loading ? 'Translating...' : 'Translate to KO'}
-      </button>
+      {hasOriginal ? (
+        <button
+          onClick={onShowOriginal}
+          className="original-btn"
+          title="Show original"
+        >
+          Show Original
+        </button>
+      ) : (
+        <button
+          onClick={handleTranslate}
+          disabled={loading}
+          className="translate-btn"
+          title="Translate to Korean"
+        >
+          {loading ? 'Translating...' : 'Translate to KO'}
+        </button>
+      )}
       {error && <span className="error-message">{error}</span>}
     </div>
   )

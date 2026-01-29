@@ -296,6 +296,23 @@ body {
   cursor: not-allowed;
 }
 
+.original-btn {
+  padding: 0.5rem 1rem;
+  background-color: #ff9800;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+}
+
+.original-btn:hover {
+  background-color: #f57c00;
+}
+
 /* Theme Toggle Styles */
 .theme-toggle {
   display: flex;

@@ -67,10 +67,30 @@ print(fibonacci(10))
 
 function App() {
   const [markdown, setMarkdown] = useState(DEFAULT_MARKDOWN)
+  const [originalMarkdown, setOriginalMarkdown] = useState(null)
   const [theme, setTheme] = useState(() => {
     const saved = localStorage.getItem('theme')
     return saved || 'light'
   })
+
+  const handleLoad = (content) => {
+    setMarkdown(content)
+    setOriginalMarkdown(null) // Reset original when new content is loaded
+  }
+
+  const handleTranslate = (translated) => {
+    if (!originalMarkdown) {
+      setOriginalMarkdown(markdown) // Save original before translating
+    }
+    setMarkdown(translated)
+  }
+
+  const handleShowOriginal = () => {
+    if (originalMarkdown) {
+      setMarkdown(originalMarkdown)
+      setOriginalMarkdown(null)
+    }
+  }
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
@@ -86,8 +106,13 @@ function App() {
       <header className="header">
         <h1>Markdown Viewer</h1>
         <div className="header-actions">
-          <FileLoader onLoad={setMarkdown} />
-          <TranslateButton markdown={markdown} onTranslate={setMarkdown} />
+          <FileLoader onLoad={handleLoad} />
+          <TranslateButton
+            markdown={markdown}
+            onTranslate={handleTranslate}
+            hasOriginal={!!originalMarkdown}
+            onShowOriginal={handleShowOriginal}
+          />
           <ThemeToggle theme={theme} onToggle={toggleTheme} />
         </div>
       </header>
