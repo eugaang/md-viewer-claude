@@ -4,18 +4,24 @@ function FileLoader({ onLoad }) {
   const [url, setUrl] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [showPasteArea, setShowPasteArea] = useState(false)
+  const [pasteText, setPasteText] = useState('')
 
-  const handleClipboardPaste = async () => {
+  const handlePasteSubmit = () => {
+    if (!pasteText.trim()) {
+      setError('Please paste some content')
+      return
+    }
+    onLoad(pasteText)
+    setPasteText('')
+    setShowPasteArea(false)
     setError('')
-    try {
-      const text = await navigator.clipboard.readText()
-      if (!text.trim()) {
-        setError('Clipboard is empty')
-        return
-      }
-      onLoad(text)
-    } catch (err) {
-      setError('Failed to read clipboard. Please allow clipboard access.')
+  }
+
+  const handlePasteKeyDown = (e) => {
+    if (e.key === 'Escape') {
+      setShowPasteArea(false)
+      setPasteText('')
     }
   }
 
@@ -77,7 +83,10 @@ function FileLoader({ onLoad }) {
           className="file-input"
         />
       </label>
-      <button onClick={handleClipboardPaste} className="clipboard-btn">
+      <button
+        onClick={() => setShowPasteArea(!showPasteArea)}
+        className={`clipboard-btn ${showPasteArea ? 'active' : ''}`}
+      >
         Paste
       </button>
       <div className="url-input-wrapper">
@@ -98,6 +107,35 @@ function FileLoader({ onLoad }) {
         </button>
       </div>
       {error && <span className="error-message">{error}</span>}
+
+      {showPasteArea && (
+        <div className="paste-modal">
+          <div className="paste-modal-content">
+            <div className="paste-modal-header">
+              <span>Paste Markdown</span>
+              <button
+                onClick={() => { setShowPasteArea(false); setPasteText(''); }}
+                className="paste-modal-close"
+              >
+                ×
+              </button>
+            </div>
+            <textarea
+              value={pasteText}
+              onChange={(e) => setPasteText(e.target.value)}
+              onKeyDown={handlePasteKeyDown}
+              placeholder="Paste your markdown here (Ctrl+V / Cmd+V)..."
+              className="paste-textarea"
+              autoFocus
+            />
+            <div className="paste-modal-actions">
+              <button onClick={handlePasteSubmit} className="paste-submit-btn">
+                Load Markdown
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
