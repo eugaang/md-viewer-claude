@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import MarkdownViewer from './components/MarkdownViewer'
 import FileLoader from './components/FileLoader'
 import TableOfContents from './components/TableOfContents'
@@ -72,39 +72,11 @@ function App() {
     const saved = localStorage.getItem('theme')
     return saved || 'light'
   })
-  const [fileHandle, setFileHandle] = useState(null)
-  const [fileName, setFileName] = useState(null)
-  const fileLoaderRef = useRef(null)
 
   const handleLoad = (content) => {
     setMarkdown(content)
     setOriginalMarkdown(null) // Reset original when new content is loaded
   }
-
-  const handleFileHandleChange = useCallback((handle) => {
-    setFileHandle(handle)
-  }, [])
-
-  const handleFileNameChange = useCallback((name) => {
-    setFileName(name)
-  }, [])
-
-  const handleRefresh = useCallback(async () => {
-    if (fileHandle) {
-      // File System Access API supported - read directly
-      try {
-        const file = await fileHandle.getFile()
-        const content = await file.text()
-        setMarkdown(content)
-        setOriginalMarkdown(null)
-      } catch (err) {
-        console.error('Error refreshing file:', err)
-      }
-    } else if (fileName) {
-      // Fallback - open file picker again
-      fileLoaderRef.current?.openFilePicker()
-    }
-  }, [fileHandle, fileName])
 
   const handleTranslate = (translated) => {
     if (!originalMarkdown) {
@@ -134,21 +106,7 @@ function App() {
       <header className="header">
         <h1>Markdown Viewer</h1>
         <div className="header-actions">
-          <FileLoader
-            ref={fileLoaderRef}
-            onLoad={handleLoad}
-            onFileHandleChange={handleFileHandleChange}
-            onFileNameChange={handleFileNameChange}
-          />
-          {fileName && (
-            <button
-              onClick={handleRefresh}
-              className="refresh-btn"
-              title={fileHandle ? "Refresh file" : "Re-open file to refresh"}
-            >
-              Refresh
-            </button>
-          )}
+          <FileLoader onLoad={handleLoad} />
           <TranslateButton
             markdown={markdown}
             onTranslate={handleTranslate}
