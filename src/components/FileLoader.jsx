@@ -209,6 +209,6 @@ const FileLoader = forwardRef(function FileLoader({ onLoad, onFileHandleChange, 
       )}
     </div>
   )
-}
+})
 
 export default FileLoader
