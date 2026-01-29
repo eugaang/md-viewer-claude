@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useRef, forwardRef, useImperativeHandle } from 'react'
 
-function FileLoader({ onLoad, onFileHandleChange }) {
+const FileLoader = forwardRef(function FileLoader({ onLoad, onFileHandleChange, onFileNameChange }, ref) {
   const [url, setUrl] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -8,6 +8,18 @@ function FileLoader({ onLoad, onFileHandleChange }) {
   const [pasteText, setPasteText] = useState('')
   const [currentFileName, setCurrentFileName] = useState('')
   const fileHandleRef = useRef(null)
+  const fileInputRef = useRef(null)
+
+  // Expose methods to parent
+  useImperativeHandle(ref, () => ({
+    openFilePicker: () => {
+      if (supportsFileSystemAccess) {
+        handleOpenWithFileSystemAccess()
+      } else {
+        fileInputRef.current?.click()
+      }
+    }
+  }))
 
   const handlePasteSubmit = () => {
     if (!pasteText.trim()) {
@@ -17,6 +29,7 @@ function FileLoader({ onLoad, onFileHandleChange }) {
     fileHandleRef.current = null
     setCurrentFileName('')
     onFileHandleChange?.(null)
+    onFileNameChange?.(null)
     onLoad(pasteText)
     setPasteText('')
     setShowPasteArea(false)
@@ -52,6 +65,7 @@ function FileLoader({ onLoad, onFileHandleChange }) {
       fileHandleRef.current = fileHandle
       setCurrentFileName(file.name)
       onFileHandleChange?.(fileHandle)
+      onFileNameChange?.(file.name)
       onLoad(content)
       setError('')
     } catch (err) {
@@ -74,6 +88,7 @@ function FileLoader({ onLoad, onFileHandleChange }) {
     fileHandleRef.current = null
     setCurrentFileName(file.name)
     onFileHandleChange?.(null)
+    onFileNameChange?.(file.name)
 
     const reader = new FileReader()
     reader.onload = (event) => {
@@ -100,6 +115,7 @@ function FileLoader({ onLoad, onFileHandleChange }) {
       fileHandleRef.current = null
       setCurrentFileName('')
       onFileHandleChange?.(null)
+      onFileNameChange?.(null)
       onLoad(text)
       setUrl('')
     } catch (err) {
@@ -125,6 +141,7 @@ function FileLoader({ onLoad, onFileHandleChange }) {
         <label className="file-input-label">
           <span>Open File</span>
           <input
+            ref={fileInputRef}
             type="file"
             accept=".md,.markdown"
             onChange={handleFileChange}

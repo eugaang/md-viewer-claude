@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import MarkdownViewer from './components/MarkdownViewer'
 import FileLoader from './components/FileLoader'
 import TableOfContents from './components/TableOfContents'
@@ -73,6 +73,8 @@ function App() {
     return saved || 'light'
   })
   const [fileHandle, setFileHandle] = useState(null)
+  const [fileName, setFileName] = useState(null)
+  const fileLoaderRef = useRef(null)
 
   const handleLoad = (content) => {
     setMarkdown(content)
@@ -83,17 +85,26 @@ function App() {
     setFileHandle(handle)
   }, [])
 
+  const handleFileNameChange = useCallback((name) => {
+    setFileName(name)
+  }, [])
+
   const handleRefresh = useCallback(async () => {
-    if (!fileHandle) return
-    try {
-      const file = await fileHandle.getFile()
-      const content = await file.text()
-      setMarkdown(content)
-      setOriginalMarkdown(null)
-    } catch (err) {
-      console.error('Error refreshing file:', err)
+    if (fileHandle) {
+      // File System Access API supported - read directly
+      try {
+        const file = await fileHandle.getFile()
+        const content = await file.text()
+        setMarkdown(content)
+        setOriginalMarkdown(null)
+      } catch (err) {
+        console.error('Error refreshing file:', err)
+      }
+    } else if (fileName) {
+      // Fallback - open file picker again
+      fileLoaderRef.current?.openFilePicker()
     }
-  }, [fileHandle])
+  }, [fileHandle, fileName])
 
   const handleTranslate = (translated) => {
     if (!originalMarkdown) {
@@ -123,12 +134,17 @@ function App() {
       <header className="header">
         <h1>Markdown Viewer</h1>
         <div className="header-actions">
-          <FileLoader onLoad={handleLoad} onFileHandleChange={handleFileHandleChange} />
-          {fileHandle && (
+          <FileLoader
+            ref={fileLoaderRef}
+            onLoad={handleLoad}
+            onFileHandleChange={handleFileHandleChange}
+            onFileNameChange={handleFileNameChange}
+          />
+          {fileName && (
             <button
               onClick={handleRefresh}
               className="refresh-btn"
-              title="Refresh file"
+              title={fileHandle ? "Refresh file" : "Re-open file to refresh"}
             >
               Refresh
             </button>
