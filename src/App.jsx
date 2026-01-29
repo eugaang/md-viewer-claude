@@ -3,6 +3,7 @@ import MarkdownViewer from './components/MarkdownViewer'
 import FileLoader from './components/FileLoader'
 import TableOfContents from './components/TableOfContents'
 import ThemeToggle from './components/ThemeToggle'
+import TranslateButton from './components/TranslateButton'
 
 const DEFAULT_MARKDOWN = `# Markdown Viewer에 오신 것을 환영합니다!
 
@@ -86,6 +87,7 @@ function App() {
         <h1>Markdown Viewer</h1>
         <div className="header-actions">
           <FileLoader onLoad={setMarkdown} />
+          <TranslateButton markdown={markdown} onTranslate={setMarkdown} />
           <ThemeToggle theme={theme} onToggle={toggleTheme} />
         </div>
       </header>
