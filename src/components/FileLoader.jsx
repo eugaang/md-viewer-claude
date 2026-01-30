@@ -12,7 +12,7 @@ function FileLoader({ onLoad }) {
       setError('Please paste some content')
       return
     }
-    onLoad(pasteText)
+    onLoad(pasteText, 'Pasted')
     setPasteText('')
     setShowPasteArea(false)
     setError('')
@@ -37,7 +37,7 @@ function FileLoader({ onLoad }) {
     setError('')
     const reader = new FileReader()
     reader.onload = (event) => {
-      onLoad(event.target.result)
+      onLoad(event.target.result, file.name)
     }
     reader.onerror = () => {
       setError('Failed to read file')
@@ -57,7 +57,8 @@ function FileLoader({ onLoad }) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
       const text = await response.text()
-      onLoad(text)
+      const fileName = url.split('/').pop().split('?')[0] || 'URL'
+      onLoad(text, fileName)
       setUrl('')
     } catch (err) {
       setError(`Failed to load URL: ${err.message}`)
