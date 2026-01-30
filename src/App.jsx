@@ -165,8 +165,9 @@ function App() {
       </header>
       <div className={`main-content ${isResizing ? 'is-resizing' : ''}`}>
         <button
-          className={`sidebar-toggle ${sidebarVisible ? '' : 'sidebar-hidden'}`}
+          className="sidebar-toggle"
           onClick={toggleSidebar}
+          style={{ left: sidebarVisible ? sidebarWidth : 0 }}
           title={sidebarVisible ? 'Hide Table of Contents' : 'Show Table of Contents'}
         >
           {sidebarVisible ? '◀' : '▶'}
