@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import MarkdownViewer from './components/MarkdownViewer'
 import FileLoader from './components/FileLoader'
 import TableOfContents from './components/TableOfContents'
@@ -72,6 +72,16 @@ function App() {
     const saved = localStorage.getItem('theme')
     return saved || 'light'
   })
+  const [sidebarVisible, setSidebarVisible] = useState(() => {
+    const saved = localStorage.getItem('sidebarVisible')
+    return saved !== 'false'
+  })
+  const [sidebarWidth, setSidebarWidth] = useState(() => {
+    const saved = localStorage.getItem('sidebarWidth')
+    return saved ? parseInt(saved, 10) : 280
+  })
+  const [isResizing, setIsResizing] = useState(false)
+  const sidebarRef = useRef(null)
 
   const handleLoad = (content) => {
     setMarkdown(content)
@@ -101,6 +111,43 @@ function App() {
     setTheme(prev => prev === 'light' ? 'dark' : 'light')
   }
 
+  const toggleSidebar = () => {
+    setSidebarVisible(prev => {
+      localStorage.setItem('sidebarVisible', !prev)
+      return !prev
+    })
+  }
+
+  const startResizing = useCallback((e) => {
+    e.preventDefault()
+    setIsResizing(true)
+  }, [])
+
+  const stopResizing = useCallback(() => {
+    setIsResizing(false)
+  }, [])
+
+  const resize = useCallback((e) => {
+    if (isResizing && sidebarRef.current) {
+      const newWidth = e.clientX - sidebarRef.current.getBoundingClientRect().left
+      if (newWidth >= 180 && newWidth <= 500) {
+        setSidebarWidth(newWidth)
+        localStorage.setItem('sidebarWidth', newWidth)
+      }
+    }
+  }, [isResizing])
+
+  useEffect(() => {
+    if (isResizing) {
+      window.addEventListener('mousemove', resize)
+      window.addEventListener('mouseup', stopResizing)
+    }
+    return () => {
+      window.removeEventListener('mousemove', resize)
+      window.removeEventListener('mouseup', stopResizing)
+    }
+  }, [isResizing, resize, stopResizing])
+
   return (
     <div className="app">
       <header className="header">
@@ -116,10 +163,27 @@ function App() {
           <ThemeToggle theme={theme} onToggle={toggleTheme} />
         </div>
       </header>
-      <div className="main-content">
-        <aside className="sidebar">
-          <TableOfContents markdown={markdown} />
-        </aside>
+      <div className={`main-content ${isResizing ? 'is-resizing' : ''}`}>
+        <button
+          className={`sidebar-toggle ${sidebarVisible ? '' : 'sidebar-hidden'}`}
+          onClick={toggleSidebar}
+          title={sidebarVisible ? 'Hide Table of Contents' : 'Show Table of Contents'}
+        >
+          {sidebarVisible ? '◀' : '▶'}
+        </button>
+        {sidebarVisible && (
+          <aside
+            className="sidebar"
+            ref={sidebarRef}
+            style={{ width: sidebarWidth, minWidth: sidebarWidth }}
+          >
+            <TableOfContents markdown={markdown} />
+            <div
+              className="sidebar-resizer"
+              onMouseDown={startResizing}
+            />
+          </aside>
+        )}
         <main className="viewer-container">
           <MarkdownViewer content={markdown} />
         </main>

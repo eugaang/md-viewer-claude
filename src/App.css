@@ -69,6 +69,12 @@ body {
 .main-content {
   display: flex;
   flex: 1;
+  position: relative;
+}
+
+.main-content.is-resizing {
+  user-select: none;
+  cursor: col-resize;
 }
 
 .sidebar {
@@ -81,6 +87,54 @@ body {
   top: 60px;
   height: calc(100vh - 60px);
   overflow-y: auto;
+  flex-shrink: 0;
+}
+
+.sidebar-toggle {
+  position: fixed;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 50;
+  width: 24px;
+  height: 60px;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-left: none;
+  border-radius: 0 6px 6px 0;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.sidebar-toggle:hover {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  width: 28px;
+}
+
+.sidebar-toggle.sidebar-hidden {
+  left: 0;
+}
+
+.sidebar-resizer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 6px;
+  height: 100%;
+  cursor: col-resize;
+  background-color: transparent;
+  transition: background-color 0.2s;
+}
+
+.sidebar-resizer:hover,
+.main-content.is-resizing .sidebar-resizer {
+  background-color: var(--accent-color);
 }
 
 .viewer-container {
@@ -401,6 +455,10 @@ body {
   }
 
   .sidebar {
+    display: none;
+  }
+
+  .sidebar-toggle {
     display: none;
   }
 
