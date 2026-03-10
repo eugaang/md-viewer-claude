@@ -6,7 +6,7 @@ let tabIdCounter = 1
 
 function App() {
   const [tabs, setTabs] = useState([
-    { id: 0, name: 'Welcome', content: '# 테스트 마크다운\n\n이것은 **테스트**입니다.', originalContent: null }
+    { id: 0, name: 'Welcome', content: '', originalContent: null }
   ])
   const [activeTabId, setActiveTabId] = useState(0)
 
