@@ -13,10 +13,11 @@ function App() {
   const activeTab = tabs.find(tab => tab.id === activeTabId) || tabs[0]
   const markdown = activeTab?.content || ''
 
-  const handleLoad = (content, fileName = 'Untitled') => {
+  const handleLoad = (content, fileName = 'Untitled', sourcePath = null) => {
     const newTab = {
       id: tabIdCounter++,
       name: fileName.replace(/\.md$/i, ''),
+      sourcePath: sourcePath || fileName,
       content,
       originalContent: null
     }
@@ -65,7 +66,7 @@ function App() {
             className={`tab ${tab.id === activeTabId ? 'tab-active' : ''}`}
             onClick={() => setActiveTabId(tab.id)}
           >
-            <span className="tab-name">{tab.name}</span>
+            <span className="tab-name" title={tab.sourcePath || tab.name}>{tab.name}</span>
             {tabs.length > 1 && (
               <button
                 className="tab-close"

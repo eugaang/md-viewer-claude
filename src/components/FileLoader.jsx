@@ -31,7 +31,7 @@ function FileLoader({ onLoad }) {
     setError('')
     const reader = new FileReader()
     reader.onload = (event) => {
-      onLoad(event.target.result, file.name)
+      onLoad(event.target.result, file.name, file.name)
     }
     reader.onerror = () => {
       setError('Failed to read file')
@@ -52,7 +52,7 @@ function FileLoader({ onLoad }) {
       }
       const text = await response.text()
       const fileName = url.split('/').pop().split('?')[0] || 'URL'
-      onLoad(text, fileName)
+      onLoad(text, fileName, url)
       setUrl('')
     } catch (err) {
       setError(`Failed to load URL: ${err.message}`)
