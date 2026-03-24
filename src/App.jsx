@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import MarkdownViewer from './components/MarkdownViewer'
 import FileLoader from './components/FileLoader'
 
@@ -9,6 +9,16 @@ function App() {
     { id: 0, name: 'Welcome', content: '', originalContent: null }
   ])
   const [activeTabId, setActiveTabId] = useState(0)
+  const [editingTabId, setEditingTabId] = useState(null)
+  const [editingName, setEditingName] = useState('')
+  const editInputRef = useRef(null)
+
+  useEffect(() => {
+    if (editingTabId !== null && editInputRef.current) {
+      editInputRef.current.focus()
+      editInputRef.current.select()
+    }
+  }, [editingTabId])
 
   const activeTab = tabs.find(tab => tab.id === activeTabId) || tabs[0]
   const markdown = activeTab?.content || ''
@@ -35,6 +45,30 @@ function App() {
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
+  }
+
+  const handleRenameStart = (tabId, currentName, e) => {
+    e.stopPropagation()
+    setEditingTabId(tabId)
+    setEditingName(currentName)
+  }
+
+  const handleRenameCommit = (tabId) => {
+    const trimmed = editingName.trim()
+    if (trimmed) {
+      setTabs(prev => prev.map(tab =>
+        tab.id === tabId ? { ...tab, name: trimmed } : tab
+      ))
+    }
+    setEditingTabId(null)
+  }
+
+  const handleRenameKeyDown = (tabId, e) => {
+    if (e.key === 'Enter') {
+      handleRenameCommit(tabId)
+    } else if (e.key === 'Escape') {
+      setEditingTabId(null)
+    }
   }
 
   const handleCloseTab = (tabId, e) => {
@@ -66,7 +100,25 @@ function App() {
             className={`tab ${tab.id === activeTabId ? 'tab-active' : ''}`}
             onClick={() => setActiveTabId(tab.id)}
           >
-            <span className="tab-name" title={tab.sourcePath || tab.name}>{tab.name}</span>
+            {editingTabId === tab.id ? (
+              <input
+                ref={editInputRef}
+                className="tab-name-input"
+                value={editingName}
+                onChange={(e) => setEditingName(e.target.value)}
+                onBlur={() => handleRenameCommit(tab.id)}
+                onKeyDown={(e) => handleRenameKeyDown(tab.id, e)}
+                onClick={(e) => e.stopPropagation()}
+              />
+            ) : (
+              <span
+                className="tab-name"
+                title={tab.sourcePath}
+                onDoubleClick={(e) => handleRenameStart(tab.id, tab.name, e)}
+              >
+                {tab.name}
+              </span>
+            )}
             {tabs.length > 1 && (
               <button
                 className="tab-close"

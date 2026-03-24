@@ -130,6 +130,19 @@ body {
   max-width: 150px;
   overflow: hidden;
   text-overflow: ellipsis;
+  cursor: default;
+}
+
+.tab-name-input {
+  max-width: 150px;
+  font-size: 0.875rem;
+  font-family: inherit;
+  padding: 0 2px;
+  border: 1px solid var(--accent-color);
+  border-radius: 3px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  outline: none;
 }
 
 .tab-close {
